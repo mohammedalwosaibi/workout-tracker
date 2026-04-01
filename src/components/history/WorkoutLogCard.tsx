@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import { calculateVolume } from '@/lib/progressive-overload';
 import { formatDate } from '@/lib/utils';
 import type { WorkoutLog, Exercise } from '@/types';
@@ -27,18 +26,19 @@ export default function WorkoutLogCard({ log, exercises, prevLog }: WorkoutLogCa
     ? ((totalVolume - prevTotalVolume) / prevTotalVolume) * 100
     : null;
 
-  const muscles = [...new Set(
-    log.exercises.map(e => getExercise(e.exerciseId)?.muscleGroup).filter(Boolean),
-  )];
+  const exerciseNames = log.exercises
+    .map(e => getExercise(e.exerciseId)?.name)
+    .filter(Boolean);
 
   return (
     <Card hover className="cursor-pointer" onClick={() => setExpanded(!expanded)}>
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-gray-200">{formatDate(log.date)}</p>
-          <div className="flex gap-1 mt-1">
-            {muscles.map(m => m && <Badge key={m} muscle={m} />)}
-          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            {exerciseNames.slice(0, 3).join(', ')}
+            {exerciseNames.length > 3 && ` +${exerciseNames.length - 3}`}
+          </p>
         </div>
         <div className="text-right">
           <p className="font-medium text-gray-200">{totalVolume.toLocaleString()} lbs</p>
@@ -65,12 +65,9 @@ export default function WorkoutLogCard({ log, exercises, prevLog }: WorkoutLogCa
             const exercise = getExercise(entry.exerciseId);
             return (
               <div key={entry.exerciseId}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-gray-300">
-                    {exercise?.name || 'Unknown'}
-                  </span>
-                  {exercise && <Badge muscle={exercise.muscleGroup} />}
-                </div>
+                <span className="text-sm font-medium text-gray-300 mb-1 block">
+                  {exercise?.name || 'Unknown'}
+                </span>
                 <div className="flex gap-3 text-xs text-gray-500">
                   {entry.sets.map((s, i) => (
                     <span key={i}>

@@ -38,11 +38,11 @@ export function getSuggestion(
     };
   }
 
-  // Find first set below max and add 1 rep to it (and optionally next set)
-  let repsAdded = 0;
-  const suggestedSets = lastPerformance.map(set => {
-    if (set.reps < exercise.repRangeMax && repsAdded < 2) {
-      repsAdded++;
+  // Find the lowest rep count, then pick the earliest set with that count
+  const minReps = Math.min(...lastPerformance.map(s => s.reps));
+  const targetIndex = lastPerformance.findIndex(s => s.reps === minReps);
+  const suggestedSets = lastPerformance.map((set, i) => {
+    if (i === targetIndex) {
       return { weight: set.weight, reps: set.reps + 1 };
     }
     return { ...set };
@@ -50,7 +50,7 @@ export function getSuggestion(
 
   return {
     type: 'increase_reps',
-    message: `Push for ${repsAdded === 1 ? '1 extra rep' : 'a couple extra reps'} on your earlier sets. Target: ${exercise.repRangeMax} across all sets.`,
+    message: `+1 rep on set ${targetIndex + 1}. Goal: ${exercise.repRangeMax} reps across all sets.`,
     suggestedSets,
   };
 }

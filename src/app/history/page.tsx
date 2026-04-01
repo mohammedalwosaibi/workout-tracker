@@ -32,7 +32,7 @@ export default function HistoryPage() {
           title="No workouts logged yet"
           description="Complete your first workout to see it here."
           actionLabel="Start Workout"
-          actionHref="/workout"
+          actionHref="/"
         />
       ) : (
         <div className="space-y-3">

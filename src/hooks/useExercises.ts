@@ -3,7 +3,7 @@
 import { useLocalStorage } from './useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
-import type { Exercise, MuscleGroup } from '@/types';
+import type { Exercise, DayOfWeek } from '@/types';
 
 export function useExercises() {
   const [exercises, setExercises, mounted] = useLocalStorage<Exercise[]>(
@@ -25,8 +25,8 @@ export function useExercises() {
     setExercises(prev => prev.filter(e => e.id !== id));
   };
 
-  const getExercisesByMuscle = (muscle: MuscleGroup): Exercise[] => {
-    return exercises.filter(e => e.muscleGroup === muscle);
+  const getExercisesByDay = (day: DayOfWeek): Exercise[] => {
+    return exercises.filter(e => e.days.includes(day));
   };
 
   const getExerciseById = (id: string): Exercise | undefined => {
@@ -38,7 +38,7 @@ export function useExercises() {
     addExercise,
     updateExercise,
     deleteExercise,
-    getExercisesByMuscle,
+    getExercisesByDay,
     getExerciseById,
     mounted,
   };

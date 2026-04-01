@@ -6,25 +6,23 @@ test.describe('Progressive Overload', () => {
     await page.evaluate(() => localStorage.clear());
     await page.reload();
 
-    // Add exercise
-    await page.click('text=Add Exercise');
-    await page.fill('#exercise-name', 'Bench Press');
-    await page.selectOption('#muscle-group', 'chest');
-    await page.fill('#rep-min', '8');
-    await page.fill('#rep-max', '12');
-    await page.fill('#sets', '3');
-    await page.click('button:has-text("Add Exercise"):not(:has-text("+"))');
+    // Add exercise assigned to Monday
+    await page.getByRole('button', { name: '+ Add Exercise' }).click();
+    await page.locator('#exercise-name').fill('Bench Press');
+    await page.getByRole('button', { name: 'Mon' }).click();
+    await page.locator('#rep-min').fill('8');
+    await page.locator('#rep-max').fill('12');
+    await page.locator('#sets').fill('3');
+    await page.locator('form').getByRole('button', { name: 'Add Exercise' }).click();
   });
 
   test('shows first-time message for new exercises', async ({ page }) => {
-    await page.goto('/workout');
-    await page.click('text=Bench Press');
-    await expect(page.locator('text=First time')).toBeVisible();
+    await page.goto('/day/monday');
+    await expect(page.getByText('First time')).toBeVisible();
   });
 
   test('shows suggestions after first workout', async ({ page }) => {
-    await page.goto('/workout');
-    await page.click('text=Bench Press');
+    await page.goto('/day/monday');
 
     // Log first workout: 40lbs x 10 reps x 3 sets
     const inputs = await page.locator('input[type="number"]').all();
@@ -32,16 +30,15 @@ test.describe('Progressive Overload', () => {
       await inputs[i].fill(i % 2 === 0 ? '40' : '10');
     }
 
-    await page.click('text=Add to Session');
-    await page.click('button:has-text("Finish Workout")');
+    await page.getByRole('button', { name: 'Finish Workout' }).click();
+    await expect(page.getByText('Workout Complete')).toBeVisible();
 
-    // Start new workout
-    await page.click('text=New Workout');
-    await page.click('text=Bench Press');
+    // Go back and visit day page again
+    await page.goto('/day/monday');
 
-    // Should show suggestion to increase reps
-    await expect(page.locator('text=extra rep')).toBeVisible();
+    // Should show suggestion to increase reps (+1 rep on first set)
+    await expect(page.getByText('+1 rep')).toBeVisible();
     // Should show "Last time" values
-    await expect(page.locator('text=40 × 10').first()).toBeVisible();
+    await expect(page.getByText('40 × 10').first()).toBeVisible();
   });
 });

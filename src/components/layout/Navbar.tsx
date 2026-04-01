@@ -2,20 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-
-const NAV_LINKS = [
-  { href: '/', label: 'Dashboard', icon: '⌂' },
-  { href: '/workout', label: 'Workout', icon: '💪' },
-  { href: '/exercises', label: 'Exercises', icon: '📋' },
-  { href: '/plan', label: 'Plan', icon: '📅' },
-  { href: '/history', label: 'History', icon: '📊' },
-];
+import { useState, useMemo } from 'react';
+import { cn, getDayOfWeek } from '@/lib/utils';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = useMemo(() => [
+    { href: '/', label: 'Dashboard', icon: '⌂' },
+    { href: `/day/${getDayOfWeek()}`, label: 'Today', icon: '💪', matchPrefix: '/day/' },
+    { href: '/exercises', label: 'Exercises', icon: '📋' },
+    { href: '/history', label: 'History', icon: '📊' },
+  ], []);
+
+  const isActive = (link: typeof navLinks[number]) => {
+    if (link.matchPrefix) return pathname.startsWith(link.matchPrefix);
+    return pathname === link.href;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50">
@@ -27,13 +31,13 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(link => (
+            {navLinks.map(link => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 className={cn(
                   'px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                  pathname === link.href
+                  isActive(link)
                     ? 'bg-indigo-500/20 text-indigo-300'
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50',
                 )}
@@ -64,14 +68,14 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-gray-800/50 bg-gray-950/95 backdrop-blur-xl">
           <div className="px-4 py-2 space-y-1">
-            {NAV_LINKS.map(link => (
+            {navLinks.map(link => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className={cn(
                   'block px-4 py-3 rounded-lg text-sm font-medium transition-all',
-                  pathname === link.href
+                  isActive(link)
                     ? 'bg-indigo-500/20 text-indigo-300'
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50',
                 )}

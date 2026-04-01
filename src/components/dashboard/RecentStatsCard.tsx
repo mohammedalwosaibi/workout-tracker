@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import { calculateVolume } from '@/lib/progressive-overload';
 import { formatDate } from '@/lib/utils';
 import type { WorkoutLog, Exercise } from '@/types';
@@ -32,19 +31,18 @@ export default function RecentStatsCard({ logs, exercises }: RecentStatsCardProp
           const totalVolume = log.exercises.reduce(
             (sum, e) => sum + calculateVolume(e.sets), 0,
           );
-          const muscles = [...new Set(
-            log.exercises
-              .map(e => getExercise(e.exerciseId)?.muscleGroup)
-              .filter(Boolean),
-          )];
+          const exerciseNames = log.exercises
+            .map(e => getExercise(e.exerciseId)?.name)
+            .filter(Boolean);
 
           return (
             <div key={log.id} className="flex items-center justify-between py-2 border-b border-gray-800/50 last:border-0">
               <div>
                 <p className="text-sm text-gray-300">{formatDate(log.date)}</p>
-                <div className="flex gap-1 mt-1">
-                  {muscles.map(m => m && <Badge key={m} muscle={m} />)}
-                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {exerciseNames.slice(0, 3).join(', ')}
+                  {exerciseNames.length > 3 && ` +${exerciseNames.length - 3}`}
+                </p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-200">{totalVolume.toLocaleString()} lbs</p>

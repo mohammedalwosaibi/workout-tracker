@@ -1,5 +1,4 @@
 export const STORAGE_KEYS = {
-  PLAN: 'wt-plan',
   EXERCISES: 'wt-exercises',
   LOGS: 'wt-logs',
   STATS: 'wt-stats',

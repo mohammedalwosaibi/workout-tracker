@@ -10,14 +10,9 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL('/exercises');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Exercises');
 
-    // Navigate to Plan
-    await page.locator('nav').getByRole('link', { name: 'Plan' }).click();
-    await expect(page).toHaveURL('/plan');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Training Plan');
-
-    // Navigate to Workout
-    await page.locator('nav').getByRole('link', { name: 'Workout' }).click();
-    await expect(page).toHaveURL('/workout');
+    // Navigate to Today (day page)
+    await page.locator('nav').getByRole('link', { name: 'Today' }).click();
+    await expect(page).toHaveURL(/\/day\//);
 
     // Navigate to History
     await page.locator('nav').getByRole('link', { name: 'History' }).click();

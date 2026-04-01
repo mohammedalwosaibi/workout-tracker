@@ -11,11 +11,13 @@ test.describe('Exercise Management', () => {
     await expect(page.getByText('No exercises yet')).toBeVisible();
   });
 
-  test('can add a new exercise', async ({ page }) => {
+  test('can add a new exercise with days', async ({ page }) => {
     await page.getByRole('button', { name: '+ Add Exercise' }).click();
 
     await page.locator('#exercise-name').fill('Barbell Bicep Curl');
-    await page.locator('#muscle-group').selectOption('biceps');
+    // Select Monday and Thursday
+    await page.getByRole('button', { name: 'Mon' }).click();
+    await page.getByRole('button', { name: 'Thu' }).click();
     await page.locator('#rep-min').fill('8');
     await page.locator('#rep-max').fill('12');
     await page.locator('#sets').fill('3');
@@ -23,14 +25,15 @@ test.describe('Exercise Management', () => {
     await page.locator('form').getByRole('button', { name: 'Add Exercise' }).click();
 
     await expect(page.getByText('Barbell Bicep Curl')).toBeVisible();
-    // Check for the exercise count instead of badge text to avoid ambiguity
     await expect(page.getByText('1 exercise')).toBeVisible();
+    // Days should be visible
+    await expect(page.getByText('Mon, Thu')).toBeVisible();
   });
 
   test('exercise persists after reload', async ({ page }) => {
     await page.getByRole('button', { name: '+ Add Exercise' }).click();
     await page.locator('#exercise-name').fill('Bench Press');
-    await page.locator('#muscle-group').selectOption('chest');
+    await page.getByRole('button', { name: 'Mon' }).click();
     await page.locator('form').getByRole('button', { name: 'Add Exercise' }).click();
 
     await page.reload();
@@ -40,7 +43,7 @@ test.describe('Exercise Management', () => {
   test('can delete an exercise', async ({ page }) => {
     await page.getByRole('button', { name: '+ Add Exercise' }).click();
     await page.locator('#exercise-name').fill('Lat Pulldown');
-    await page.locator('#muscle-group').selectOption('back');
+    await page.getByRole('button', { name: 'Tue' }).click();
     await page.locator('form').getByRole('button', { name: 'Add Exercise' }).click();
 
     await expect(page.getByText('Lat Pulldown')).toBeVisible();
